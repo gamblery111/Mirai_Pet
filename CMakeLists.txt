@@ -10,7 +10,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 ##################   Qt ###################
 # 查找 Qt6 库 (核心, QML, 3D)
 find_package(Qt6 REQUIRED COMPONENTS
-    Quick
     Core 
     Gui 
     Widgets
@@ -29,18 +28,6 @@ qt_add_executable(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE include)
-
-set(QT_QML_GENERATE_QMLLS_INI ON)
-# 将 QML 文件加入资源系统
-qt_add_qml_module(${PROJECT_NAME}
-    URI "MyPet"  
-    VERSION 1.0
-    QML_FILES 
-        qml/Main.qml
-)
-
-# 添加资源
-qt_add_resources( ${PROJECT_NAME} "pictures.qrc" PREFIX "/" FILES resources/picture/pet.jpg)
 
 # ========  Saba + Bullet 配置开始  ========
 
@@ -89,7 +76,6 @@ set_target_properties(BulletSoftBody PROPERTIES
 # 链接库
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        Qt6::Quick
         Qt6::Core
         Qt6::Widgets
         Qt6::OpenGL
