@@ -57,14 +57,12 @@ bool PetModelController::LoadMotion(const std::string& path)
 
 void PetModelController::Update(float deltaSeconds)
 {
-	if(!m_model || !m_vmd) return;
-
 	m_elapsed += deltaSeconds;
 
-	m_model->BeginAnimation();
-	m_vmd->Evaluate(m_elapsed * 30.0f);   // MMD 标准 30fps
-	m_model->UpdateAllAnimation(m_vmd.get(), m_elapsed * 30.0f, deltaSeconds);
-	m_model->EndAnimation();
+	//m_model->BeginAnimation();
+	//m_vmd->Evaluate(m_elapsed * 30.0f);   // MMD 标准 30fps
+	//m_model->UpdateAllAnimation(m_vmd.get(), m_elapsed * 30.0f, deltaSeconds);
+	//m_model->EndAnimation();
 
 	m_model->Update();
 }

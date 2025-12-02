@@ -1,36 +1,30 @@
-﻿#pragma once
-
-#include <QOpenGLWidget>
+﻿#include <QOpenGLWidget>
 #include <QOpenGLFunctions>
-#include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLTexture>
+#include <QOpenGLShaderProgram>
+#include <QTimerEvent>
+#include <QImage>
+#include <memory>
+#include <unordered_map>
+
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
-class PetModelController;
 
-class PetRenderer  : public QOpenGLWidget, protected QOpenGLFunctions
-{
+class PetModelController; // forward
+
+class PetRenderer : public QOpenGLWidget, protected QOpenGLFunctions {
 	Q_OBJECT
-private:
-	std::unique_ptr<PetModelController> m_modelCtrl;
+public:
+	explicit PetRenderer(QWidget* parent = nullptr);
+	~PetRenderer() override;
 
-	// OpenGL 对象
-	QOpenGLShaderProgram    m_shader;
-	QOpenGLShaderProgram    m_edgeShader;   // 可选
-	QOpenGLBuffer           m_vbo;
-	QOpenGLBuffer           m_ibo;
-	QOpenGLVertexArrayObject m_vao;
-	QOpenGLTexture* m_toonRamp{ nullptr };   // 1D toon 渐变纹理
 
-	glm::mat4 m_proj{};
-	glm::mat4 m_view{};
+	bool LoadModel(const std::string& path, const std::string& mmdDir);
+	bool LoadMotion(const std::string& path);
 
-	int m_timerId{ 0 };
 
 protected:
 	void initializeGL() override;
@@ -38,15 +32,39 @@ protected:
 	void paintGL() override;
 	void timerEvent(QTimerEvent* evt) override;
 
-public:
-	explicit PetRenderer(QWidget* parent = nullptr);
-	~PetRenderer();
-
-	// 外部调用
-	bool LoadModel(const std::string& path, const std::string& mmdDir = "");
-	bool LoadMotion(const std::string& path);
 
 private:
-	void SetupVAO(size_t vcount);
-};
+	struct Vertex {
+		glm::vec3 pos;
+		glm::vec3 nor;
+		glm::vec2 uv;
+	};
 
+
+	void ensureBuffers(size_t vcount, size_t indexCount);
+	GLuint loadTextureFromImage(const QImage& img);
+	QOpenGLTexture* loadOrGetTexture(const std::string& path);
+	QOpenGLTexture* m_toonRamp = nullptr;
+
+
+	std::unique_ptr<PetModelController> m_modelCtrl;
+
+
+	glm::mat4 m_proj;
+	glm::mat4 m_view;
+
+
+	QOpenGLBuffer m_vbo{ QOpenGLBuffer::VertexBuffer };
+	QOpenGLBuffer m_ibo{ QOpenGLBuffer::IndexBuffer };
+	QOpenGLVertexArrayObject m_vao;
+
+
+	QOpenGLShaderProgram m_shader;
+
+
+	std::unordered_map<std::string, QOpenGLTexture*> m_texCache;
+
+
+	int m_timerId = 0;
+	size_t m_vboVertexCount = 0;
+};
