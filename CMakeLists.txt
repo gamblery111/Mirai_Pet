@@ -29,49 +29,8 @@ qt_add_executable(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
-# ========  Saba + Bullet 配置开始  ========
-
-set(SABA_INCLUDE_DIR 
-    "E:/Code/Open_Source_Code/saba/src"
-    "E:/Code/Open_Source_Code/saba/src/Saba"
-    "E:/Code/Open_Source_Code/saba/viewer"
-    "E:/Code/Open_Source_Code/saba/external/gl3w/include"
-)
-set(SABA_LIBRARY     "E:/Code/Open_Source_Code/saba/build-msvc2022x64/src/Debug/Saba.lib")
-
-set(BULLET_INCLUDE_DIR "E:/Code/Open_Source_Code/bullet3/build-msvc2022x64/Install_Path/include")
-set(BULLET_LIB_DIR     "E:/Code/Open_Source_Code/bullet3/build-msvc2022x64/Install_Path/lib")
-
-# 添加 include
-target_include_directories(${PROJECT_NAME}
-    PRIVATE
-        ${SABA_INCLUDE_DIR}
-        ${BULLET_INCLUDE_DIR}
-)
-
-add_library(Bullet3Dynamics      UNKNOWN IMPORTED)
-set_target_properties(Bullet3Dynamics PROPERTIES
-    IMPORTED_LOCATION_DEBUG          "${BULLET_LIB_DIR}/Bullet3Dynamics_Debug.lib"
-)
-
-add_library(Bullet3Collision    UNKNOWN IMPORTED)
-set_target_properties(Bullet3Collision PROPERTIES
-    IMPORTED_LOCATION_DEBUG          "${BULLET_LIB_DIR}/Bullet3Collision_Debug.lib"
-)
-
-add_library(Bullet3Common      UNKNOWN IMPORTED)
-set_target_properties(Bullet3Common PROPERTIES
-    IMPORTED_LOCATION_DEBUG          "${BULLET_LIB_DIR}/Bullet3Common_Debug.lib"
-)
-
-add_library(LinearMath    UNKNOWN IMPORTED)
-set_target_properties(LinearMath PROPERTIES
-    IMPORTED_LOCATION_DEBUG          "${BULLET_LIB_DIR}/LinearMath_Debug.lib"
-)
-add_library(BulletSoftBody      UNKNOWN IMPORTED)
-set_target_properties(BulletSoftBody PROPERTIES
-    IMPORTED_LOCATION_DEBUG          "${BULLET_LIB_DIR}/BulletSoftBody_Debug.lib"
-)
+# ========  Saba + Bullet 配置  ========
+include(cmake/ThirdParty.cmake)
 
 # 链接库
 target_link_libraries(${PROJECT_NAME}
@@ -80,16 +39,7 @@ target_link_libraries(${PROJECT_NAME}
         Qt6::Widgets
         Qt6::OpenGL
         Qt6::OpenGLWidgets
-         ${SABA_LIBRARY}
 
-        Bullet3Dynamics
-        Bullet3Collision
-        Bullet3Common
-        LinearMath
-        BulletSoftBody
-        debug     "${BULLET_LIB_DIR}/BulletDynamics_Debug.lib"
-        optimized "${BULLET_LIB_DIR}/BulletDynamics.lib"
-        
-        debug     "${BULLET_LIB_DIR}/BulletCollision_Debug.lib"
-        optimized "${BULLET_LIB_DIR}/BulletCollision.lib"
+        Saba
+        BulletAll
 )
