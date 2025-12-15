@@ -1,0 +1,21 @@
+#pragma once
+
+#include <QMainWindow>
+
+
+namespace miraipet::ui
+{
+
+    class PetGLWidget;
+    class PetMainWindow : public QMainWindow
+    {
+    private:
+        PetGLWidget *m_glWidget;
+
+    public:
+        PetMainWindow();
+        ~PetMainWindow();
+
+    };
+
+}

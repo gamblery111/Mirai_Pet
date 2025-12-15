@@ -1,18 +1,17 @@
 ﻿#include <iostream>
 
 #include <QApplication>
-#include <QMainWindow>
 
-#include "PetWindow.h"
+#include "PetMainWindow.h"
 
 int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
 
-	PetWindow win;
+	miraipet::ui::PetMainWindow win;
 	win.show();
 
-	win.loadModel("E:/MMd/haila/海拉3.0.pmx", "E:/MMd/haila");
+	// win.loadModel("E:/MMd/haila/海拉3.0.pmx", "E:/MMd/haila");
 
 	return app.exec();
 }
