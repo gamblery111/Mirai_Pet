@@ -22,6 +22,8 @@ qt_standard_project_setup()
 include(cmake/ThirdParty.cmake)
 
 ################## 子模块 ##################
+add_subdirectory(src/engine)
+add_subdirectory(src/mmd)
 add_subdirectory(src/app)
 
 qt_add_executable(${PROJECT_NAME}
@@ -31,5 +33,6 @@ qt_add_executable(${PROJECT_NAME}
 # 链接库
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        mirai_pet_engine
+        mirai_pet_app
+
 )
