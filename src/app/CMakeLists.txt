@@ -12,6 +12,7 @@ target_include_directories(mirai_pet_app
 target_link_libraries(mirai_pet_app
     PUBLIC
         mirai_pet_engine
+        mirai_pet_mmd
         Qt6::Widgets
         Qt6::OpenGL
         Qt6::OpenGLWidgets

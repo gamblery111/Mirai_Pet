@@ -12,7 +12,6 @@ namespace miraipet::ui
 
     class PetGLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_3_Core
     {
-        // Q_OBJECT
     private:
         std::unique_ptr<PetAppController> m_controller;
 

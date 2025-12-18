@@ -12,4 +12,5 @@ target_link_libraries(mirai_pet_mmd
         mirai_pet_engine
     PRIVATE
         Saba
+        BulletAll
 )

@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <string>
 
 namespace miraipet::render { class PetRenderer; }
 namespace miraipet::context { struct RenderContext; }
@@ -22,5 +23,9 @@ namespace miraipet::ui
         ~PetAppController();
 
         void Frame();
+        void LoadModel();
+
+    private:
+        void InitContext(PetGLWidget *widget);
     };
 }
