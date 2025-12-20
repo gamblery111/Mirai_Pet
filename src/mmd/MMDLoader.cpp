@@ -15,7 +15,7 @@ namespace miraipet::MMD
     {
     }
 
-    Model::PetModelData MMDLoader::load(const std::string &_pmxPath, const std::string &mmdDataDir)
+    std::shared_ptr<Model::PetModelData> MMDLoader::load(const std::string &_pmxPath, const std::string &mmdDataDir)
     {
         saba::PMXModel pmx;
         if (!pmx.Load(_pmxPath, mmdDataDir))
@@ -23,19 +23,25 @@ namespace miraipet::MMD
             throw std::runtime_error("Failed to load PMX model.");
         }
 
-        Model::PetModelData modelData;
+        std::shared_ptr<Model::PetModelData> modelData = std::make_shared<Model::PetModelData>();
 
         // 设置顶点数据
-        std::vector<float> vertices;
-        const glm::vec3* positions = pmx.GetPositions();
+        std::vector<Model::Vertex> vertices;
+        const auto* positions = pmx.GetPositions();
+        const auto* normals = pmx.GetNormals();
+        // 获取顶点的纹理坐标（UV）数据
+        const auto* texCoords = pmx.GetUVs(); 
         size_t vertexCount = pmx.GetVertexCount();
+
         for (size_t i = 0; i < vertexCount; i++)
         {
-            vertices.push_back(positions[i].x);
-            vertices.push_back(positions[i].y);
-            vertices.push_back(positions[i].z);
+            Model::Vertex vertex;
+            vertex.position = {positions[i].x, positions[i].y, positions[i].z};
+            vertex.normal = {normals[i].x, normals[i].y, normals[i].z};
+            vertex.texCoord = {texCoords[i].x, texCoords[i].y};
+            vertices.push_back(vertex);
         }
-        modelData.SetVertices(vertices);
+        modelData->SetVertices(vertices);
 
         // 设置索引数据
         std::vector<unsigned int> indices;
@@ -49,38 +55,16 @@ namespace miraipet::MMD
             // 16-bit indices
             const uint16_t* indexPtr = static_cast<const uint16_t*>(indexData);
             for (size_t i = 0; i < indexCount; i++) {
-                indices.push_back(static_cast<unsigned int>(indexPtr[i]));
+                indices.push_back(indexPtr[i]);
             }
         } else if (indexElementSize == 4) {
             // 32-bit indices
             const uint32_t* indexPtr = static_cast<const uint32_t*>(indexData);
             for (size_t i = 0; i < indexCount; i++) {
-                indices.push_back(static_cast<unsigned int>(indexPtr[i]));
+                indices.push_back(indexPtr[i]);
             }
         }
-
-        modelData.SetIndices(indices);
-
-        // 设置法线数据
-        std::vector<float> normals;
-        const glm::vec3* normalData = pmx.GetNormals();
-        for (size_t i = 0; i < vertexCount; i++)
-        {
-            normals.push_back(normalData[i].x);
-            normals.push_back(normalData[i].y);
-            normals.push_back(normalData[i].z);
-        }
-        modelData.SetNormals(normals);
-
-        // 设置UV坐标数据
-        std::vector<float> uvs;
-        const glm::vec2* uvData = pmx.GetUVs();
-        for (size_t i = 0; i < vertexCount; i++)
-        {
-            uvs.push_back(uvData[i].x);
-            uvs.push_back(uvData[i].y);
-        }
-        modelData.SetUVs(uvs);
+        modelData->SetIndices(indices);
 
         // 设置纹理数据
         std::vector<std::string> textures;
@@ -95,7 +79,7 @@ namespace miraipet::MMD
                 textures.push_back(texturePath);
             }
         }
-        modelData.SetTextures(textures);
+        modelData->SetTextures(textures);
 
         return modelData;
     }

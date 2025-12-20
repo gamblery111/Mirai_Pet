@@ -11,19 +11,9 @@ namespace miraipet::Model
     {
     }
 
-    void PetModelData::SetVertices(const std::vector<float>& vertices)
+    void PetModelData::SetVertices(const std::vector<Vertex>& vertices)
     {
         m_vertices = vertices;
-    }
-
-    void PetModelData::SetNormals(const std::vector<float>& normals)
-    {
-        m_normals = normals;
-    }
-
-    void PetModelData::SetUVs(const std::vector<float>& uvs)
-    {
-        m_uvs = uvs;
     }
 
     void PetModelData::SetIndices(const std::vector<unsigned int>& indices)
@@ -36,19 +26,9 @@ namespace miraipet::Model
         m_textures = textures;
     }
 
-    const std::vector<float>& PetModelData::GetVertices() const
+    const std::vector<Vertex>& PetModelData::GetVertices() const
     {
         return m_vertices;
-    }
-
-    const std::vector<float>& PetModelData::GetNormals() const
-    {
-        return m_normals;
-    }
-
-    const std::vector<float>& PetModelData::GetUVs() const
-    {
-        return m_uvs;
     }
 
     const std::vector<unsigned int>& PetModelData::GetIndices() const

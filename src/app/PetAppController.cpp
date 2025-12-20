@@ -1,5 +1,6 @@
 #include "PetAppController.h"
 #include "context/RenderContext.h"
+#include "model/PetModelData.h"
 #include "render/PetRenderer.h"
 #include "render/PetShaderManager.h"
 #include "PetGLWidget.h"
@@ -36,7 +37,11 @@ namespace miraipet::ui
         MMD::MMDLoader loader;
         auto modelData = loader.load(modelPath, dataDir);
 
-        // TODO: 将 modelData 传递给渲染器或其他组件
+        // 将 modelData 传递给渲染器
+        if (modelData) {
+           m_context->currentModelData = modelData;
+           m_renderer->UpdateModelData();
+        }
     }
 
     void PetAppController::InitContext(PetGLWidget *widget)

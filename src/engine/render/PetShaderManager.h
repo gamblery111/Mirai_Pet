@@ -16,6 +16,7 @@ namespace miraipet::render
         ~PetShaderManager();
 
         QOpenGLShaderProgram *CreateBasicShader();
+        QOpenGLShaderProgram *CreateMMDShader();
     };
 
 }
