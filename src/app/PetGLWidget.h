@@ -16,11 +16,12 @@ namespace miraipet::ui
         std::unique_ptr<PetAppController> m_controller;
 
     public:
-        PetGLWidget(QWidget* parent = nullptr);
+        PetGLWidget(QWidget *parent = nullptr);
         ~PetGLWidget();
 
     protected:
         void initializeGL() override;
+        void resizeGL(int w, int h) override;
         void paintGL() override;
     };
 

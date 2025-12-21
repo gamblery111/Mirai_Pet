@@ -5,6 +5,10 @@
 #include "context/RenderContext.h"
 #include "model/PetModelData.h"
 
+#include <QOpenGLFunctions>
+
+#include <glm/gtc/matrix_transform.hpp>
+
 namespace miraipet::render
 {
 
@@ -22,17 +26,11 @@ namespace miraipet::render
 
     void PetRenderer::Cleanup()
     {
-        if (m_ctx && m_ctx->gl)
-        {
-            if (m_vao != 0)
-                m_ctx->gl->glDeleteVertexArrays(1, &m_vao);
-            if (m_vbo != 0)
-                m_ctx->gl->glDeleteBuffers(1, &m_vbo);
-            if (m_ibo != 0)
-                m_ctx->gl->glDeleteBuffers(1, &m_ibo);
-            if (m_texture != 0)
-                m_ctx->gl->glDeleteTextures(1, &m_texture);
-        }
+        m_vao.destroy();
+        m_vbo.destroy();
+        m_ibo.destroy();
+        if (m_texture)
+            m_texture.reset();
     }
 
     void PetRenderer::UpdateModelData()
@@ -42,10 +40,11 @@ namespace miraipet::render
 
     void PetRenderer::Render()
     {
-        m_ctx->gl->glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        m_ctx->gl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+        f->glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if (m_vao == 0)
+        if (!m_vao.isCreated())
             return;
 
         m_program->bind();
@@ -61,35 +60,37 @@ namespace miraipet::render
         m_program->setUniformValue("projection", projection);
 
         // 绑定纹理
-        if (m_texture != 0)
+        if (m_texture)
         {
-            m_ctx->gl->glActiveTexture(GL_TEXTURE0);
-            m_ctx->gl->glBindTexture(GL_TEXTURE_2D, m_texture);
+            m_texture->bind(0);
             m_program->setUniformValue("texture1", 0);
         }
 
         // 渲染模型
-        m_ctx->gl->glBindVertexArray(m_vao);
-        m_ctx->gl->glDrawElements(GL_TRIANGLES, m_indexCount, m_indexType, nullptr);
-        m_ctx->gl->glBindVertexArray(0);
+        m_vao.bind();
+        f->glDrawElements(GL_TRIANGLES, m_indexCount, m_indexType, nullptr);
+        m_vao.release();
 
         m_program->release();
+    }
+
+    void PetRenderer::ResizeGL(int w, int h)
+    {
+        // m_proj = glm::perspective(glm::radians(45.0f), float(w) / qMax(h, 1), 0.1f, 1000.0f);
     }
 
     void PetRenderer::Initialize()
     {
         m_program = m_ctx->shaderManager->CreateMMDShader();
-
-        // 初始化VAO, VBO, IBO为0，表示尚未创建
-        m_vao = 0;
-        m_vbo = 0;
-        m_ibo = 0;
-        m_texture = 0;
+        m_vao.create();
+        m_vbo.create();
+        m_ibo.create();
+        m_texture.reset();
     }
 
     void PetRenderer::SetupModelBuffers()
     {
-        if (!m_ctx->gl || !m_ctx->currentModelData)
+        if (!m_ctx->currentModelData)
             return;
 
         // 清理旧的缓冲区
@@ -99,87 +100,56 @@ namespace miraipet::render
         const auto &modelVertices = m_ctx->currentModelData->GetVertices();
         std::vector<float> vertices;
 
-        // 将顶点数据组合成一个连续的数组
         for (const auto &vertex : modelVertices)
         {
-            // 位置 (x, y, z)
             vertices.push_back(vertex.position[0]);
             vertices.push_back(vertex.position[1]);
             vertices.push_back(vertex.position[2]);
-
-            // 法线 (nx, ny, nz)
             vertices.push_back(vertex.normal[0]);
             vertices.push_back(vertex.normal[1]);
             vertices.push_back(vertex.normal[2]);
-
-            // UV坐标 (u, v)
             vertices.push_back(vertex.uv[0]);
             vertices.push_back(vertex.uv[1]);
-
-            // 骨骼索引 (4个int转换为4个float)
             for (int i = 0; i < 4; i++)
-            {
                 vertices.push_back(static_cast<float>(vertex.boneIndices[i]));
-            }
-
-            // 骨骼权重 (4个float)
             for (int i = 0; i < 4; i++)
-            {
                 vertices.push_back(vertex.boneWeights[i]);
-            }
         }
 
-        // 获取索引数据
         const unsigned char *indexData = m_ctx->currentModelData->GetIndexBuffer();
         m_indexCount = static_cast<GLsizei>(m_ctx->currentModelData->GetIndexCount());
         size_t indexElementSize = m_ctx->currentModelData->GetIndexElementSize();
 
-        // 创建并填充VBO和IBO
-        m_ctx->gl->glGenVertexArrays(1, &m_vao);
-        m_ctx->gl->glGenBuffers(1, &m_vbo);
-        m_ctx->gl->glGenBuffers(1, &m_ibo);
+        m_vao.create();
+        m_vao.bind();
 
-        m_ctx->gl->glBindVertexArray(m_vao);
+        m_vbo.create();
+        m_vbo.bind();
+        m_vbo.allocate(vertices.data(), vertices.size() * sizeof(float));
 
-        // VBO
-        m_ctx->gl->glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-        m_ctx->gl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+        m_ibo.create();
+        m_ibo.bind();
+        m_ibo.allocate(indexData, m_indexCount * indexElementSize);
 
-        // IBO - 根据索引元素大小设置不同类型
-        m_ctx->gl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-        m_ctx->gl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * indexElementSize, indexData, GL_STATIC_DRAW);
-
-        // 根据索引元素大小设置绘制类型
         m_indexType = (indexElementSize == 2) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
-
-        // 设置顶点属性指针
-        // 每个顶点16个float，步长为16 * sizeof(float)
         const int stride = 16 * sizeof(float);
 
-        // 位置属性 (location = 0)
-        m_ctx->gl->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void *)0);
-        m_ctx->gl->glEnableVertexAttribArray(0);
+        QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+        f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void *)0);
+        f->glEnableVertexAttribArray(0);
+        f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+        f->glEnableVertexAttribArray(1);
+        f->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+        f->glEnableVertexAttribArray(2);
+        f->glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, stride, (void *)(8 * sizeof(float)));
+        f->glEnableVertexAttribArray(3);
+        f->glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, stride, (void *)(12 * sizeof(float)));
+        f->glEnableVertexAttribArray(4);
 
-        // 法线属性
-        m_ctx->gl->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-        m_ctx->gl->glEnableVertexAttribArray(1);
+        m_vao.release();
+        m_vbo.release();
+        m_ibo.release();
 
-        // UV坐标属性
-        m_ctx->gl->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-        m_ctx->gl->glEnableVertexAttribArray(2);
-
-        // 骨骼索引属性
-        m_ctx->gl->glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, stride, (void *)(8 * sizeof(float)));
-        m_ctx->gl->glEnableVertexAttribArray(3);
-
-        // 骨骼权重属性
-        m_ctx->gl->glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, stride, (void *)(12 * sizeof(float)));
-        m_ctx->gl->glEnableVertexAttribArray(4);
-
-        // 解绑
-        m_ctx->gl->glBindVertexArray(0);
-
-        // 加载纹理
         LoadModelTexture();
     }
 
@@ -188,31 +158,15 @@ namespace miraipet::render
         if (!m_ctx->currentModelData || m_ctx->currentModelData->GetTextures().empty())
             return;
 
-        // 加载第一个纹理作为演示
-        // 实际应用中应该加载所有纹理并根据材质使用
         const std::string &texturePath = m_ctx->currentModelData->GetTextures()[0];
-
-        // 使用Qt加载图像
         QImage textureImage(QString::fromStdString(texturePath));
         if (textureImage.isNull())
-        {
             return;
-        }
-
-        // 转换为OpenGL兼容格式
         textureImage = textureImage.convertToFormat(QImage::Format_RGBA8888);
 
-        // 生成纹理
-        m_ctx->gl->glGenTextures(1, &m_texture);
-        m_ctx->gl->glBindTexture(GL_TEXTURE_2D, m_texture);
-
-        m_ctx->gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureImage.width(), textureImage.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, textureImage.bits());
-
-        m_ctx->gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        m_ctx->gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        m_ctx->gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        m_ctx->gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        m_ctx->gl->glBindTexture(GL_TEXTURE_2D, 0);
+        m_texture = std::make_unique<QOpenGLTexture>(textureImage);
+        m_texture->setMinificationFilter(QOpenGLTexture::Linear);
+        m_texture->setMagnificationFilter(QOpenGLTexture::Linear);
+        m_texture->setWrapMode(QOpenGLTexture::Repeat);
     }
 }

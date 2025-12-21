@@ -3,8 +3,7 @@
 namespace miraipet::render
 {
 
-    PetShaderManager::PetShaderManager(QOpenGLFunctions_3_3_Core *_gl)
-        : m_gl(_gl)
+    PetShaderManager::PetShaderManager()
     {
     }
 

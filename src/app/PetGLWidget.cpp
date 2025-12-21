@@ -24,6 +24,10 @@ namespace miraipet::ui
         m_controller = std::make_unique<PetAppController>(this);
     }
 
+    void PetGLWidget::resizeGL(int w, int h)
+    {
+    }
+
     void PetGLWidget::paintGL()
     {
         m_controller->Frame();

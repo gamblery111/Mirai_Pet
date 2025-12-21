@@ -1,8 +1,19 @@
 #pragma once
 
-#include <QOpenGLShaderProgram>
 
-namespace miraipet::context{struct RenderContext;}
+#include <memory>
+
+#include <QOpenGLShaderProgram>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLBuffer>
+#include <QOpenGLTexture>
+
+// #include "glm/glm.hpp"
+
+namespace miraipet::context
+{
+    struct RenderContext;
+}
 
 namespace miraipet::render
 {
@@ -10,23 +21,24 @@ namespace miraipet::render
     class PetRenderer
     {
         using RenderCtx = context::RenderContext;
-
     private:
         RenderCtx *m_ctx;
         QOpenGLShaderProgram *m_program{nullptr};
-        unsigned int m_vao{0};
-        unsigned int m_vbo{0};
-        unsigned int m_ibo{0};
-        unsigned int m_texture{0};
+        QOpenGLVertexArrayObject m_vao;
+        QOpenGLBuffer m_vbo{QOpenGLBuffer::VertexBuffer};
+        QOpenGLBuffer m_ibo{QOpenGLBuffer::IndexBuffer};
+        std::unique_ptr<QOpenGLTexture> m_texture;
         GLsizei m_indexCount = 0;
         unsigned int m_indexType = GL_UNSIGNED_INT; // 索引类型，支持GL_UNSIGNED_SHORT和GL_UNSIGNED_INT
 
+        // glm::mat4 m_proj;
 
     public:
         PetRenderer(RenderCtx *ctx);
         ~PetRenderer();
 
         void Render();
+        void ResizeGL(int w, int h);
         void UpdateModelData();
 
     private:

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLShaderProgram>
 
 namespace miraipet::render
@@ -8,11 +7,8 @@ namespace miraipet::render
 
     class PetShaderManager
     {
-    private:
-        QOpenGLFunctions_3_3_Core *m_gl;
-
     public:
-        PetShaderManager(QOpenGLFunctions_3_3_Core *_gl);
+        PetShaderManager();
         ~PetShaderManager();
 
         QOpenGLShaderProgram *CreateBasicShader();

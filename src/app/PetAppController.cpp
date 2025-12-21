@@ -48,11 +48,7 @@ namespace miraipet::ui
     {
         m_context = std::make_unique<RenderCtx>();
 
-        m_context->gl = static_cast<QOpenGLFunctions_3_3_Core *>(widget);
-
-        assert(m_context->gl != nullptr);
-
         // ShaderManager
-        m_context->shaderManager = new render::PetShaderManager(m_context->gl);
+        m_context->shaderManager = new render::PetShaderManager();
     }
 }
