@@ -19,6 +19,7 @@ namespace miraipet::render
         unsigned int m_ibo{0};
         unsigned int m_texture{0};
         GLsizei m_indexCount = 0;
+        unsigned int m_indexType = GL_UNSIGNED_INT; // 索引类型，支持GL_UNSIGNED_SHORT和GL_UNSIGNED_INT
 
 
     public:
