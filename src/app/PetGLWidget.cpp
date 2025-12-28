@@ -7,11 +7,6 @@ namespace miraipet::ui
     PetGLWidget::PetGLWidget(QWidget *parent)
         : QOpenGLWidget(parent)
     {
-        // 设置 OpenGL 3.3 Core Profile
-        QSurfaceFormat fmt;
-        fmt.setVersion(3, 3);
-        fmt.setProfile(QSurfaceFormat::CoreProfile);
-        setFormat(fmt);
     }
 
     PetGLWidget::~PetGLWidget()

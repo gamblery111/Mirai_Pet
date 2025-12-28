@@ -1,4 +1,5 @@
 #include <QImage>
+#include <QVector4D>
 
 #include "PetRenderer.h"
 #include "PetShaderManager.h"
@@ -21,7 +22,6 @@ namespace miraipet::render
     PetRenderer::~PetRenderer()
     {
         Cleanup();
-        delete m_program;
     }
 
     void PetRenderer::Cleanup()
@@ -41,7 +41,7 @@ namespace miraipet::render
     void PetRenderer::Render()
     {
         QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-        f->glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        f->glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (!m_vao.isCreated())
@@ -55,15 +55,27 @@ namespace miraipet::render
         view.translate(0, 0, -5.0f);
         projection.perspective(45.0f, m_ctx->aspectRatio, 0.1f, 100.0f);
 
-        m_program->setUniformValue("model", model);
-        m_program->setUniformValue("view", view);
-        m_program->setUniformValue("projection", projection);
+        QMatrix4x4 modelView = view * model;
+        QMatrix4x4 mvp = projection * modelView;
+        QMatrix3x3 normalMatrix = modelView.normalMatrix();
 
-        // 绑定纹理
-        if (m_texture)
-        {
-            m_texture->bind(0);
-            m_program->setUniformValue("texture1", 0);
+        m_program->setUniformValue("uMVP", mvp);
+        m_program->setUniformValue("uMV", modelView);
+        m_program->setUniformValue("uN", normalMatrix);
+
+        // 设置材质参数
+        m_program->setUniformValue("uDiff", QVector4D(1.0f, 1.0f, 1.0f, 1.0f)); // 默认白色漫反射
+        m_program->setUniformValue("uAlpha", 1.0f); // 默认不透明
+
+        // 绑定主纹理（模型纹理或默认纹理）
+        QOpenGLTexture *textureToBind = m_texture ? m_texture.get() : m_defaultTexture.get();
+        textureToBind->bind(0);
+        m_program->setUniformValue("uTex", 0);
+
+        // 绑定toon纹理
+        if (m_ctx->shaderManager->GetToonTexture()) {
+            m_ctx->shaderManager->GetToonTexture()->bind(1);
+            m_program->setUniformValue("uToon", 1);
         }
 
         // 渲染模型
@@ -81,11 +93,21 @@ namespace miraipet::render
 
     void PetRenderer::Initialize()
     {
-        m_program = m_ctx->shaderManager->CreateMMDShader();
+        QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+        f->initializeOpenGLFunctions();
+
+        // 设置OpenGL状态
+        f->glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        f->glEnable(GL_DEPTH_TEST);
+        f->glEnable(GL_BLEND);
+        f->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        m_program = m_ctx->shaderManager->GetMMDShader();
         m_vao.create();
         m_vbo.create();
         m_ibo.create();
         m_texture.reset();
+        CreateDefaultTexture();
     }
 
     void PetRenderer::SetupModelBuffers()
@@ -151,6 +173,18 @@ namespace miraipet::render
         m_ibo.release();
 
         LoadModelTexture();
+    }
+
+    void PetRenderer::CreateDefaultTexture()
+    {
+        // 创建1x1白色像素的默认纹理
+        QImage defaultImage(1, 1, QImage::Format_RGBA8888);
+        defaultImage.setPixelColor(0, 0, QColor(255, 255, 255, 255));
+
+        m_defaultTexture = std::make_unique<QOpenGLTexture>(defaultImage);
+        m_defaultTexture->setMinificationFilter(QOpenGLTexture::Linear);
+        m_defaultTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+        m_defaultTexture->setWrapMode(QOpenGLTexture::Repeat);
     }
 
     void PetRenderer::LoadModelTexture()

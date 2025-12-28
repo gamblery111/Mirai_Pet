@@ -28,6 +28,7 @@ namespace miraipet::render
         QOpenGLBuffer m_vbo{QOpenGLBuffer::VertexBuffer};
         QOpenGLBuffer m_ibo{QOpenGLBuffer::IndexBuffer};
         std::unique_ptr<QOpenGLTexture> m_texture;
+        std::unique_ptr<QOpenGLTexture> m_defaultTexture;
         GLsizei m_indexCount = 0;
         unsigned int m_indexType = GL_UNSIGNED_INT; // 索引类型，支持GL_UNSIGNED_SHORT和GL_UNSIGNED_INT
 
@@ -48,8 +49,21 @@ namespace miraipet::render
          * @brief 清理资源
          */
         void Cleanup();
+
+        /**
+         * @brief 设置顶点缓冲区和索引缓冲区
+         */
         void SetupModelBuffers();
+
+        /**
+         * @brief 加载模型纹理
+         */
         void LoadModelTexture();
+
+        /**
+         * @brief 创建默认纹理
+         */
+        void CreateDefaultTexture();
     };
 
 }
