@@ -24,6 +24,7 @@ namespace miraipet::ui
 
         void Frame();
         void LoadModel();
+        void Resize(int w, int h);
 
     private:
         void InitContext(PetGLWidget *widget);

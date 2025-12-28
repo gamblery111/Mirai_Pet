@@ -21,6 +21,9 @@ namespace miraipet::ui
 
     void PetGLWidget::resizeGL(int w, int h)
     {
+        if (m_controller) {
+            m_controller->Resize(w, h);
+        }
     }
 
     void PetGLWidget::paintGL()

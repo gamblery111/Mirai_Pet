@@ -30,6 +30,12 @@ namespace miraipet::ui
         m_renderer->Render();
     }
 
+    void PetAppController::Resize(int w, int h)
+    {
+        m_context->aspectRatio = static_cast<float>(w) / static_cast<float>(h);
+        m_renderer->ResizeGL(w, h);
+    }
+
     void PetAppController::LoadModel()
     {
         const std::string modelPath = "E:/MMd/haila/海拉3.0.pmx";
@@ -50,5 +56,14 @@ namespace miraipet::ui
 
         // ShaderManager
         m_context->shaderManager = new render::PetShaderManager();
+
+        // 初始化宽高比
+        if (widget) {
+            int w = widget->width();
+            int h = widget->height();
+            if (h > 0) {
+                m_context->aspectRatio = static_cast<float>(w) / static_cast<float>(h);
+            }
+        }
     }
 }

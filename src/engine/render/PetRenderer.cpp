@@ -52,8 +52,12 @@ namespace miraipet::render
         // 设置矩阵变换
         QMatrix4x4 model, view, projection;
         model.setToIdentity();
-        view.translate(0, 0, -5.0f);
-        projection.perspective(45.0f, m_ctx->aspectRatio, 0.1f, 100.0f);
+        // model.scale(0.1f);  // MMD模型通常较大，缩小到合适大小
+
+        view.setToIdentity();
+        view.translate(0.0f, 0.0f, -50.0f);  // 相机后退，更远一些以看到完整模型
+
+        projection.perspective(45.0f, m_ctx->aspectRatio, 0.1f, 1000.0f);  // 扩大远裁剪面
 
         QMatrix4x4 modelView = view * model;
         QMatrix4x4 mvp = projection * modelView;
@@ -88,7 +92,8 @@ namespace miraipet::render
 
     void PetRenderer::ResizeGL(int w, int h)
     {
-        // m_proj = glm::perspective(glm::radians(45.0f), float(w) / qMax(h, 1), 0.1f, 1000.0f);
+        QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+        f->glViewport(0, 0, w, h);
     }
 
     void PetRenderer::Initialize()
@@ -97,10 +102,14 @@ namespace miraipet::render
         f->initializeOpenGLFunctions();
 
         // 设置OpenGL状态
-        f->glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        f->glClearColor(0.5f, 0.5f, 0.5f, 1.0f);  // 灰色背景便于观察
         f->glEnable(GL_DEPTH_TEST);
+        f->glDepthFunc(GL_LEQUAL);
         f->glEnable(GL_BLEND);
         f->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        // 禁用面剔除，确保能看到所有面
+        f->glDisable(GL_CULL_FACE);
 
         m_program = m_ctx->shaderManager->GetMMDShader();
         m_vao.create();
@@ -159,9 +168,9 @@ namespace miraipet::render
         QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
         f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void *)0);
         f->glEnableVertexAttribArray(0);
-        f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+        f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void *)(3 * sizeof(float)));
         f->glEnableVertexAttribArray(1);
-        f->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+        f->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void *)(6 * sizeof(float)));
         f->glEnableVertexAttribArray(2);
         f->glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, stride, (void *)(8 * sizeof(float)));
         f->glEnableVertexAttribArray(3);
