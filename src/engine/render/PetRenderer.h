@@ -31,6 +31,8 @@ namespace miraipet::render
         std::unique_ptr<QOpenGLTexture> m_defaultTexture;
         GLsizei m_indexCount = 0;
         unsigned int m_indexType = GL_UNSIGNED_INT; // 索引类型，支持GL_UNSIGNED_SHORT和GL_UNSIGNED_INT
+        int m_viewportWidth = 0;
+        int m_viewportHeight = 0;
 
         // glm::mat4 m_proj;
 

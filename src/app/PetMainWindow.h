@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QResizeEvent>
 
 namespace miraipet::ui
 {
@@ -19,6 +20,7 @@ namespace miraipet::ui
     protected:
         void mousePressEvent(QMouseEvent *ev) override;
         void mouseMoveEvent(QMouseEvent *ev) override;
+        void resizeEvent(QResizeEvent *ev) override;
     };
 
 }

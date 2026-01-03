@@ -17,6 +17,7 @@ namespace miraipet::ui
     private:
         std::unique_ptr<RenderCtx>  m_context;
         std::unique_ptr<PetRender>  m_renderer;
+        PetGLWidget* m_widget;
         
     public:
         PetAppController(PetGLWidget* widget);
@@ -28,5 +29,6 @@ namespace miraipet::ui
 
     private:
         void InitContext(PetGLWidget *widget);
+        void AdjustWindowToModel();
     };
 }

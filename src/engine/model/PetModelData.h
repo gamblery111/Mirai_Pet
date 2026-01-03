@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <array>
+#include <cfloat>
 
 namespace miraipet::Model
 {
@@ -83,11 +84,18 @@ namespace miraipet::Model
         void SetTextures(const std::vector<std::string> &textures);
         const std::vector<std::string> &GetTextures() const;
 
+        /**
+         * @brief 计算模型的边界框
+         */
+        void CalculateBoundingBox();
+        const std::array<float, 6> &GetBoundingBox() const; // [minX, minY, minZ, maxX, maxY, maxZ]
+
     private:
         std::vector<Vertex> m_vertices;           // 顶点缓冲区
         std::vector<unsigned char> m_indexBuffer; // 索引缓冲区（二进制存储）
         size_t m_indexCount = 0;                  // 索引数量
         size_t m_indexElementSize = 0;            // 每个索引的字节大小：2 或 4
         std::vector<std::string> m_textures;      // 纹理路径列表
+        std::array<float, 6> m_boundingBox{FLT_MAX, FLT_MAX, FLT_MAX, -FLT_MAX, -FLT_MAX, -FLT_MAX}; // 边界框 [minX, minY, minZ, maxX, maxY, maxZ]
     };
 }

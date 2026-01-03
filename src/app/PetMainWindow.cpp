@@ -14,8 +14,8 @@ namespace miraipet::ui
                        Qt::WindowStaysOnTopHint |
                        Qt::Tool);
 
-        setAttribute(Qt::WA_TranslucentBackground, true);
-        setAttribute(Qt::WA_NoSystemBackground, true);
+        // setAttribute(Qt::WA_TranslucentBackground, true);
+        // setAttribute(Qt::WA_NoSystemBackground, true);
 
         m_glWidget = new PetGLWidget(this);
 
@@ -24,8 +24,9 @@ namespace miraipet::ui
         layout->addWidget(m_glWidget);
         setLayout(layout);
 
-        resize(500, 700);
-        m_glWidget->resize(500, 700);
+        // 窗口大小将根据加载的模型自动调整，这里设置一个初始大小
+        resize(800, 600);
+        m_glWidget->resize(800, 600);
 
         if (auto *screen = QGuiApplication::primaryScreen())
         {
@@ -53,6 +54,14 @@ namespace miraipet::ui
         {
             move(ev->globalPosition().toPoint() - m_dragOffset);
             ev->accept();
+        }
+    }
+
+    void PetMainWindow::resizeEvent(QResizeEvent *ev)
+    {
+        QWidget::resizeEvent(ev);
+        if (m_glWidget) {
+            m_glWidget->resize(ev->size());
         }
     }
 }

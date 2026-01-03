@@ -7,6 +7,7 @@
 #include "model/PetModelData.h"
 
 #include <QOpenGLFunctions>
+#include <algorithm>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -52,12 +53,32 @@ namespace miraipet::render
         // 设置矩阵变换
         QMatrix4x4 model, view, projection;
         model.setToIdentity();
-        // model.scale(0.1f);  // MMD模型通常较大，缩小到合适大小
+
+        // 使用固定缩放因子，窗口大小已根据模型自动调整
+        float scaleFactor = 1.0f;
+        model.scale(scaleFactor);
 
         view.setToIdentity();
-        view.translate(0.0f, 0.0f, -50.0f);  // 相机后退，更远一些以看到完整模型
+        // 计算模型中心点并调整相机位置
+        float cameraDistance = 50.0f; // 默认相机距离
+        if (m_ctx->currentModelData) {
+            const auto &bbox = m_ctx->currentModelData->GetBoundingBox();
+            // 计算模型中心点
+            float centerX = (bbox[0] + bbox[3]) * 0.5f; // (minX + maxX) / 2
+            float centerY = (bbox[1] + bbox[4]) * 0.5f; // (minY + maxY) / 2
+            float centerZ = (bbox[2] + bbox[5]) * 0.5f; // (minZ + maxZ) / 2
 
-        projection.perspective(45.0f, m_ctx->aspectRatio, 0.1f, 1000.0f);  // 扩大远裁剪面
+            // 计算模型最大尺寸，用于确定相机距离
+            float modelSize = std::max({bbox[3] - bbox[0], bbox[4] - bbox[1], bbox[5] - bbox[2]});
+            cameraDistance = std::max(30.0f, modelSize * 0.8f);  // 减小倍数让模型显得更大
+
+            // 将相机对准模型中心
+            view.translate(-centerX, -centerY, -centerZ - cameraDistance);
+        } else {
+            view.translate(0.0f, 0.0f, -cameraDistance);
+        }
+
+        projection.perspective(45.0f, m_ctx->aspectRatio, 0.1f, cameraDistance * 2.0f);  // 动态调整远裁剪面
 
         QMatrix4x4 modelView = view * model;
         QMatrix4x4 mvp = projection * modelView;
@@ -94,6 +115,10 @@ namespace miraipet::render
     {
         QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
         f->glViewport(0, 0, w, h);
+
+        // 根据窗口大小调整相机距离，使模型填充整个窗口
+        m_viewportWidth = w;
+        m_viewportHeight = h;
     }
 
     void PetRenderer::Initialize()

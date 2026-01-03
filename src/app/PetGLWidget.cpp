@@ -15,7 +15,7 @@ namespace miraipet::ui
 
     void PetGLWidget::initializeGL()
     {
-        initializeOpenGLFunctions(); // 初始化 3.3 核心函数
+        initializeOpenGLFunctions();
         m_controller = std::make_unique<PetAppController>(this);
     }
 
