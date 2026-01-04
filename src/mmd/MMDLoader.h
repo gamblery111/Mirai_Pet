@@ -12,7 +12,7 @@ namespace miraipet::MMD
     class MMDLoader
     {
     private:
-
+        float m_fModelScale{12.0f}; // 模型缩放倍数
     public:
         MMDLoader();
         ~MMDLoader();

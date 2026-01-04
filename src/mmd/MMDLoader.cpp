@@ -36,7 +36,7 @@ namespace miraipet::MMD
         for (size_t i = 0; i < vertexCount; i++)
         {
             Model::Vertex vertex{};
-            vertex.position = {positions[i].x, positions[i].y, positions[i].z};
+            vertex.position = {positions[i].x * m_fModelScale, positions[i].y * m_fModelScale, positions[i].z * m_fModelScale};
             vertex.normal = {normals[i].x, normals[i].y, normals[i].z};
             vertex.uv = {texCoords[i].x, texCoords[i].y};
             // 默认骨骼：全部设置 0

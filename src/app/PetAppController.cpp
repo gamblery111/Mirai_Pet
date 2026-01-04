@@ -9,6 +9,7 @@
 #include <QOpenGLWidget>
 #include <QWidget>
 #include <algorithm>
+#include <QScreen>
 
 namespace miraipet::ui
 {
@@ -82,20 +83,18 @@ namespace miraipet::ui
 
         const auto &bbox = m_context->currentModelData->GetBoundingBox();
 
-        // 计算模型的尺寸（MMD模型通常使用毫米为单位）
-        float modelWidthMM = bbox[3] - bbox[0];  // maxX - minX (毫米)
-        float modelHeightMM = bbox[4] - bbox[1]; // maxY - minY (毫米)
+        // 计算模型的尺寸
+        float modelWidthMM = bbox[3] - bbox[0]; 
+        float modelHeightMM = bbox[4] - bbox[1];
 
-        // 将毫米转换为像素，减小转换因子和边距让窗口更紧凑
-        const float mmToPixel = 1.5f;  // 减小转换因子
-        int windowWidth = static_cast<int>(modelWidthMM * mmToPixel + 50);   // 减小边距
-        int windowHeight = static_cast<int>(modelHeightMM * mmToPixel + 50); // 减小边距
-
-        // 设置最小和最大窗口尺寸
-        windowWidth = std::max(windowWidth, 400);
-        windowHeight = std::max(windowHeight, 300);
-        windowWidth = std::min(windowWidth, 1200);   // 最大宽度限制
-        windowHeight = std::min(windowHeight, 900);  // 最大高度限制
+        // 使用DPI感知的像素密度，让单位更精确
+        QScreen *screen = m_widget->screen();
+        float dpi = screen->physicalDotsPerInch();
+        float pixelsPerMM = dpi / 25.4f;
+        
+        // 使用物理单位直接转换（DPI感知）
+        int windowWidth = static_cast<int>(modelWidthMM * pixelsPerMM);
+        int windowHeight = static_cast<int>(modelHeightMM * pixelsPerMM);
 
         // 调整主窗口大小
         if (auto *parentWidget = m_widget->parentWidget()) {

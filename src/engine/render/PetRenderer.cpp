@@ -70,7 +70,7 @@ namespace miraipet::render
 
             // 计算模型最大尺寸，用于确定相机距离
             float modelSize = std::max({bbox[3] - bbox[0], bbox[4] - bbox[1], bbox[5] - bbox[2]});
-            cameraDistance = std::max(30.0f, modelSize * 0.8f);  // 减小倍数让模型显得更大
+            cameraDistance = std::max(30.0f, modelSize * 1.5f);  // 减小倍数让模型显得更大
 
             // 将相机对准模型中心
             view.translate(-centerX, -centerY, -centerZ - cameraDistance);
