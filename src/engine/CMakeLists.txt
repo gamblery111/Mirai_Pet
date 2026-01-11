@@ -12,8 +12,6 @@ target_include_directories(mirai_pet_engine
 
 target_link_libraries(mirai_pet_engine
     PUBLIC
-        Qt6::Core
-        Qt6::Gui
         Qt6::OpenGL
     PRIVATE
         Saba

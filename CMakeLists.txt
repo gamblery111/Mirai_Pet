@@ -25,6 +25,8 @@ include(cmake/ThirdParty.cmake)
 add_subdirectory(src/engine)
 add_subdirectory(src/mmd)
 add_subdirectory(src/app)
+add_subdirectory(src/OpenGL)
+add_subdirectory(src/BaseUtils)
 
 qt_add_executable(${PROJECT_NAME}
     src/Mirai_Pet.cpp
