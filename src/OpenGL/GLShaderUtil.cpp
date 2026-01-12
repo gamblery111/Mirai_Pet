@@ -1,6 +1,9 @@
 #include <iostream>
+#include <vector>
 
 #include "GLShaderUtil.h"
+
+#include <QOpenGLFunctions>
 
 namespace miraipet::OpenGL
 {
@@ -37,14 +40,12 @@ namespace miraipet::OpenGL
                 return GLShaderObject<ShaderType>();
             }
 
-            const char *codeArray[] = {code};
-            auto f = QOpenGLContext::currentContext()->functions();
-            f->glShaderSource(shader, 1, codeArray, nullptr);
+            GL::ShaderSource(shader, code);
 
-            f->glCompileShader(shader);
+            GL::CompileShader(shader);
 
             GLint infoLength;
-            f->glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLength);
+            GL::GetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLength);
             if (infoLength != 0)
             {
                 std::vector<char> info;
@@ -52,7 +53,7 @@ namespace miraipet::OpenGL
                 info.resize(infoLength);
 
                 GLsizei len;
-                f->glGetShaderInfoLog(shader, infoLength, &len, &info[0]);
+                GL::GetShaderInfoLog(shader, infoLength, &len, &info[0]);
                 if (info[size_t(infoLength) - 1] != '\0')
                 {
                     info.push_back('\0');
@@ -62,10 +63,10 @@ namespace miraipet::OpenGL
             }
 
             GLint compileStatus;
-            f->glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
+            GL::GetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
             if (compileStatus != GL_TRUE)
             {
-                f->glDeleteShader(shader);
+                GL::DeleteShader(shader);
                 return GLShaderObject<ShaderType>();
             }
 
@@ -94,14 +95,12 @@ namespace miraipet::OpenGL
 
         std::cout << "Start: Shader Program Link\n";
 
-        auto f = QOpenGLContext::currentContext()->functions();
-
-        f->glAttachShader(prog, vs);
-        f->glAttachShader(prog, fs);
-        f->glLinkProgram(prog);
+        GL::AttachShader(prog, vs);
+        GL::AttachShader(prog, fs);
+        GL::LinkProgram(prog);
 
         GLint infoLength;
-        f->glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &infoLength);
+        GL::GetProgramiv(prog, GL_INFO_LOG_LENGTH, &infoLength);
         if (infoLength != 0)
         {
             std::vector<char> info;
@@ -109,7 +108,7 @@ namespace miraipet::OpenGL
             info.resize(infoLength);
 
             GLsizei len;
-            f->glGetProgramInfoLog(prog, infoLength, &len, &info[0]);
+            GL::GetProgramInfoLog(prog, infoLength, &len, &info[0]);
             if (info[size_t(infoLength) - 1] != '\0')
             {
                 info.push_back('\0');
@@ -119,7 +118,7 @@ namespace miraipet::OpenGL
         }
 
         GLint linkStatus;
-        f->glGetProgramiv(prog, GL_LINK_STATUS, &linkStatus);
+        GL::GetProgramiv(prog, GL_LINK_STATUS, &linkStatus);
 
         if (linkStatus != GL_TRUE)
         {
@@ -132,61 +131,51 @@ namespace miraipet::OpenGL
     }
     void SetUniform(GLint uniform, GLint value)
     {
-        auto f = QOpenGLContext::currentContext()->functions();
-        f->glUniform1i(uniform, value);
+        GL::Uniform1i(uniform, value);
     }
 
     void SetUniform(GLint uniform, float value)
     {
-        auto f = QOpenGLContext::currentContext()->functions();
-        f->glUniform1f(uniform, value);
+        GL::Uniform1f(uniform, value);
     }
 
     void SetUniform(GLint uniform, const glm::vec2 &value)
     {
-        auto f = QOpenGLContext::currentContext()->functions();
-        f->glUniform2fv(uniform, 1, &value[0]);
+        GL::Uniform2fv(uniform, 1, &value[0]);
     }
 
     void SetUniform(GLint uniform, const glm::vec3 &value)
     {
-        auto f = QOpenGLContext::currentContext()->functions();
-        f->glUniform3fv(uniform, 1, &value[0]);
+        GL::Uniform3fv(uniform, 1, &value[0]);
     }
 
     void SetUniform(GLint uniform, const glm::vec4 &value)
     {
-        auto f = QOpenGLContext::currentContext()->functions();
-        f->glUniform4fv(uniform, 1, &value[0]);
+        GL::Uniform4fv(uniform, 1, &value[0]);
     }
 
     void SetUniform(GLint uniform, const glm::mat3 &value)
     {
-        auto f = QOpenGLContext::currentContext()->functions();
-        f->glUniformMatrix3fv(uniform, 1, GL_FALSE, &value[0][0]);
+        GL::UniformMatrix3fv(uniform, 1, GL_FALSE, &value[0][0]);
     }
 
     void SetUniform(GLint uniform, const glm::mat4 &value)
     {
-        auto f = QOpenGLContext::currentContext()->functions();
-        f->glUniformMatrix4fv(uniform, 1, GL_FALSE, &value[0][0]);
+        GL::UniformMatrix4fv(uniform, 1, GL_FALSE, &value[0][0]);
     }
 
     void SetUniform(GLint uniform, const GLint *values, GLsizei count)
     {
-        auto f = QOpenGLContext::currentContext()->functions();
-        f->glUniform1iv(uniform, count, values);
+        GL::Uniform1iv(uniform, count, values);
     }
 
     void SetUniform(GLint uniform, const float *values, GLsizei count)
     {
-        auto f = QOpenGLContext::currentContext()->functions();
-        f->glUniform1fv(uniform, count, values);
+        GL::Uniform1fv(uniform, count, values);
     }
 
     void SetUniform(GLint uniform, const glm::mat4 *values, GLsizei count)
     {
-        auto f = QOpenGLContext::currentContext()->functions();
-        f->glUniformMatrix4fv(uniform, count, GL_FALSE, &values[0][0][0]);
+        GL::UniformMatrix4fv(uniform, count, GL_FALSE, &values[0][0][0]);
     }
 }

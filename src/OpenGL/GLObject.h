@@ -1,22 +1,23 @@
 #pragma once
 
-#include <QOpenGLFunctions>
+#include "GLFacade.h"
+
+#include <qopenglfunctions.h>
 
 namespace miraipet::OpenGL
 {
+
     template <GLenum ShaderType>
     struct GLShaderTraits
     {
         static GLuint Create()
         {
-            auto f = QOpenGLContext::currentContext()->functions();
-            return f->glCreateShader(ShaderType);
+            return GL::CreateShader(ShaderType);
         }
 
         static void Destroy(GLuint shader)
         {
-            auto f = QOpenGLContext::currentContext()->functions();
-            f->glDeleteShader(shader);
+            GL::DeleteShader(shader);
         }
     };
 
@@ -25,14 +26,12 @@ namespace miraipet::OpenGL
     {
         static GLuint Create()
         {
-            auto f = QOpenGLContext::currentContext()->functions();
-            return f->glCreateProgram();
+            return GL::CreateProgram();
         }
 
         static void Destroy(GLuint program)
         {
-            auto f = QOpenGLContext::currentContext()->functions();
-            f->glDeleteProgram(program);
+            GL::DeleteProgram(program);
         }
     };
 

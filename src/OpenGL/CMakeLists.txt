@@ -1,6 +1,7 @@
 add_library(mirai_GL STATIC
     GLSLUtil.cpp
     GLShaderUtil.cpp
+    GLFacade.cpp
 )
 
 target_include_directories(mirai_GL
