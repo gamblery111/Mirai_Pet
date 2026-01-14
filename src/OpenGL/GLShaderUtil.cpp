@@ -40,12 +40,12 @@ namespace miraipet::OpenGL
                 return GLShaderObject<ShaderType>();
             }
 
-            GL::ShaderSource(shader, code);
+            GL::ShaderSource((GLuint)shader, code);
 
-            GL::CompileShader(shader);
+            GL::CompileShader((GLuint)shader);
 
             GLint infoLength;
-            GL::GetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLength);
+            GL::GetShaderiv((GLuint)shader, GL_INFO_LOG_LENGTH, &infoLength);
             if (infoLength != 0)
             {
                 std::vector<char> info;
@@ -53,7 +53,7 @@ namespace miraipet::OpenGL
                 info.resize(infoLength);
 
                 GLsizei len;
-                GL::GetShaderInfoLog(shader, infoLength, &len, &info[0]);
+                GL::GetShaderInfoLog((GLuint)shader, infoLength, &len, &info[0]);
                 if (info[size_t(infoLength) - 1] != '\0')
                 {
                     info.push_back('\0');
@@ -63,10 +63,10 @@ namespace miraipet::OpenGL
             }
 
             GLint compileStatus;
-            GL::GetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
+            GL::GetShaderiv((GLuint)shader, GL_COMPILE_STATUS, &compileStatus);
             if (compileStatus != GL_TRUE)
             {
-                GL::DeleteShader(shader);
+                GL::DeleteShader((GLuint)shader);
                 return GLShaderObject<ShaderType>();
             }
 
@@ -79,13 +79,13 @@ namespace miraipet::OpenGL
     GLProgramObject CreateShaderProgram(const char *vsCode, const char *fsCode)
     {
         GLVertexShaderObject vs(CreateShader<GL_VERTEX_SHADER>(vsCode));
-        if (vs == 0)
+        if (!vs)
         {
             return GLProgramObject();
         }
 
         GLFragmentShaderObject fs(CreateShader<GL_FRAGMENT_SHADER>(fsCode));
-        if (fs == 0)
+        if (!fs)
         {
             return GLProgramObject();
         }
@@ -95,12 +95,12 @@ namespace miraipet::OpenGL
 
         std::cout << "Start: Shader Program Link\n";
 
-        GL::AttachShader(prog, vs);
-        GL::AttachShader(prog, fs);
-        GL::LinkProgram(prog);
+        GL::AttachShader((GLuint)prog, (GLuint)vs);
+        GL::AttachShader((GLuint)prog, (GLuint)fs);
+        GL::LinkProgram((GLuint)prog);
 
         GLint infoLength;
-        GL::GetProgramiv(prog, GL_INFO_LOG_LENGTH, &infoLength);
+        GL::GetProgramiv((GLuint)prog, GL_INFO_LOG_LENGTH, &infoLength);
         if (infoLength != 0)
         {
             std::vector<char> info;
@@ -108,7 +108,7 @@ namespace miraipet::OpenGL
             info.resize(infoLength);
 
             GLsizei len;
-            GL::GetProgramInfoLog(prog, infoLength, &len, &info[0]);
+            GL::GetProgramInfoLog((GLuint)prog, infoLength, &len, &info[0]);
             if (info[size_t(infoLength) - 1] != '\0')
             {
                 info.push_back('\0');
@@ -118,7 +118,7 @@ namespace miraipet::OpenGL
         }
 
         GLint linkStatus;
-        GL::GetProgramiv(prog, GL_LINK_STATUS, &linkStatus);
+        GL::GetProgramiv((GLuint)prog, GL_LINK_STATUS, &linkStatus);
 
         if (linkStatus != GL_TRUE)
         {

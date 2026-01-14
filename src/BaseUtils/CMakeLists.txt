@@ -14,4 +14,5 @@ target_link_libraries(mirai_BaseUtils
     PRIVATE
 )
 
+# 使用unicode编码
 target_compile_definitions(mirai_BaseUtils PRIVATE UNICODE _UNICODE)

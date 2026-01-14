@@ -22,6 +22,10 @@ public:
     virtual void GetShaderiv(GLuint shader, GLenum pname, GLint *params) = 0;
     virtual void GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, char *infoLog) = 0;
 
+    // 新增函数声明
+    virtual GLint GetUniformLocation(GLuint program, const char *name) = 0;
+    virtual GLint GetAttribLocation(GLuint program, const char *name) = 0;
+
     virtual void Uniform1i(GLint location, GLint v0) = 0;
     virtual void Uniform1f(GLint location, GLfloat v0) = 0;
     virtual void Uniform2fv(GLint location, GLsizei count, const GLfloat *value) = 0;
@@ -72,7 +76,11 @@ public:
         f()->glGetShaderInfoLog(shader, bufSize, length, infoLog);
     }
 
-        void Uniform1i(GLint location, GLint v0) override { f()->glUniform1i(location, v0); }
+    // 新增函数实现
+    GLint GetUniformLocation(GLuint program, const char *name) override { return f()->glGetUniformLocation(program, name); }
+    GLint GetAttribLocation(GLuint program, const char *name) override { return f()->glGetAttribLocation(program, name); }
+
+    void Uniform1i(GLint location, GLint v0) override { f()->glUniform1i(location, v0); }
     void Uniform1f(GLint location, GLfloat v0) override { f()->glUniform1f(location, v0); }
     void Uniform2fv(GLint location, GLsizei count, const GLfloat *value) override { f()->glUniform2fv(location, count, value); }
     void Uniform3fv(GLint location, GLsizei count, const GLfloat *value) override { f()->glUniform3fv(location, count, value); }
@@ -180,6 +188,19 @@ namespace miraipet::GL
     {
         assert(g_impl && "GL not initialized!");
         g_impl->GetShaderInfoLog(shader, bufSize, length, infoLog);
+    }
+
+    // 新增函数实现
+    GLint GetUniformLocation(GLuint program, const char *name)
+    {
+        assert(g_impl && "GL not initialized!");
+        return g_impl->GetUniformLocation(program, name);
+    }
+
+    GLint GetAttribLocation(GLuint program, const char *name)
+    {
+        assert(g_impl && "GL not initialized!");
+        return g_impl->GetAttribLocation(program, name);
     }
 
     void Uniform1i(GLint location, GLint v0)

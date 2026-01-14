@@ -3,6 +3,7 @@ add_library(mirai_pet_engine STATIC
     render/PetRenderer.cpp
     render/PetShaderManager.cpp
     runtime/PetRuntime.cpp
+    context/ViewerContext.cpp
 )
 
 target_include_directories(mirai_pet_engine

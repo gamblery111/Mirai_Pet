@@ -109,7 +109,8 @@ namespace miraipet::OpenGL
             return m_obj;
         }
 
-        operator GLuint() const { return m_obj; }
+        explicit operator GLuint() const { return m_obj; }
+        explicit operator bool() const { return m_obj != 0; }
     };
 
     template <GLenum ShaderType>

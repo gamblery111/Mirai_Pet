@@ -27,6 +27,9 @@ namespace miraipet::GL
     void GetShaderiv(GLuint shader, GLenum pname, GLint *params);
     void GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, char *infoLog);
 
+    // 新增函数声明
+    GLint GetUniformLocation(GLuint program, const char *name);
+    GLint GetAttribLocation(GLuint program, const char *name);
 
     void Uniform1i(GLint location, GLint v0);
     void Uniform1f(GLint location, GLfloat v0);

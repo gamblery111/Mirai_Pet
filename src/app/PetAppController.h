@@ -2,25 +2,31 @@
 #include <memory>
 #include <string>
 
-namespace miraipet::render { class PetRenderer; }
-namespace miraipet::context { struct RenderContext; }
+namespace miraipet::render
+{
+    class PetRenderer;
+}
+namespace miraipet::context
+{
+    struct RenderContext;
+}
 
 namespace miraipet::ui
 {
-    
+
     class PetGLWidget;
     class PetAppController
     {
         using RenderCtx = context::RenderContext;
         using PetRender = render::PetRenderer;
-        
+
     private:
-        std::unique_ptr<RenderCtx>  m_context;
-        std::unique_ptr<PetRender>  m_renderer;
-        PetGLWidget* m_widget;
-        
+        std::unique_ptr<RenderCtx> m_context;
+        std::unique_ptr<PetRender> m_renderer;
+        PetGLWidget *m_widget;
+
     public:
-        PetAppController(PetGLWidget* widget);
+        PetAppController(PetGLWidget *widget);
         ~PetAppController();
 
         void Frame();
