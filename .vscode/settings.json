@@ -4,5 +4,8 @@
         "*.json": "json",
         "qpoint": "cpp",
         "memory": "cpp"
-    }
+    },
+    "Codegeex.RepoIndex": true,
+    "trae.tab.enableRename": false,
+    "trae.tab.enableAutoImport": false
 }

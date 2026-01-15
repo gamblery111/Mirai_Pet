@@ -16,4 +16,5 @@ target_link_libraries(mirai_pet_engine
         Qt6::OpenGL
     PRIVATE
         Saba
+        mirai_BaseUtils
 )

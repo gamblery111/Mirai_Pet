@@ -16,19 +16,15 @@ namespace miraipet::ui
     void PetGLWidget::initializeGL()
     {
         initializeOpenGLFunctions();
-        m_controller = std::make_unique<PetAppController>(this);
+        m_controller = std::make_unique<PetAppController>();
     }
 
     void PetGLWidget::resizeGL(int w, int h)
     {
-        if (m_controller) {
-            m_controller->Resize(w, h);
-        }
     }
 
     void PetGLWidget::paintGL()
     {
-        m_controller->Frame();
     }
 
 } // namespace miraipet::ui

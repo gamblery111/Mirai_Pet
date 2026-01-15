@@ -14,7 +14,9 @@ namespace miraipet::BaseUtils
         PathUtil &operator=(const PathUtil &) = delete;
 
         static std::string GetCWD();
-        static std::string GetExecutablePath();
+        static std::string GetExecutableFullPath();
+        static std::string GetExecutableDir();
+        // static std::string GetExecutableDir();
         static std::string Combine(const std::vector<std::string> &parts);
         static std::string Combine(const std::string &a, const std::string &b);
         static std::string GetDirectoryName(const std::string &path);
@@ -22,6 +24,6 @@ namespace miraipet::BaseUtils
         static std::string GetFilenameWithoutExt(const std::string &path);
         static std::string GetExt(const std::string &path);
         static std::string GetDelimiter();
-        static std::string Normalize(const std::string &path);
     };
+
 }

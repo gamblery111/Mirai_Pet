@@ -36,5 +36,12 @@ qt_add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         mirai_pet_app
+)
 
+
+# 生成后事件, 复制资源目录到可执行文件目录
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/resources
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources
 )
