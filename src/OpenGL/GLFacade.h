@@ -26,8 +26,10 @@ namespace miraipet::GL
     void GetProgramInfoLog(GLuint program, GLsizei bufSize, GLsizei *length, char *infoLog);
     void GetShaderiv(GLuint shader, GLenum pname, GLint *params);
     void GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, char *infoLog);
+    void GenFramebuffers(GLsizei n, GLuint *framebuffers);
+    void DeleteFramebuffers(GLsizei n, const GLuint *framebuffers);
 
-    // 新增函数声明
+
     GLint GetUniformLocation(GLuint program, const char *name);
     GLint GetAttribLocation(GLuint program, const char *name);
 
@@ -40,4 +42,8 @@ namespace miraipet::GL
     void UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
     void Uniform1iv(GLint location, GLsizei count, const GLint *value);
     void Uniform1fv(GLint location, GLsizei count, const GLfloat *value);
+
+    void BindTexture(GLenum target, GLuint texture);
+    void TexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels);
+    void TexParameteri(GLenum target, GLenum pname, GLint param);
 }

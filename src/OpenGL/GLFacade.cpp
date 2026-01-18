@@ -21,8 +21,10 @@ public:
     virtual void GetProgramInfoLog(GLuint program, GLsizei bufSize, GLsizei *length, char *infoLog) = 0;
     virtual void GetShaderiv(GLuint shader, GLenum pname, GLint *params) = 0;
     virtual void GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, char *infoLog) = 0;
+    virtual void GenFramebuffers(GLsizei n, GLuint *framebuffers) = 0;
+    virtual void DeleteFramebuffers(GLsizei n, const GLuint *framebuffers) = 0;
 
-    // 新增函数声明
+
     virtual GLint GetUniformLocation(GLuint program, const char *name) = 0;
     virtual GLint GetAttribLocation(GLuint program, const char *name) = 0;
 
@@ -35,6 +37,10 @@ public:
     virtual void UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) = 0;
     virtual void Uniform1iv(GLint location, GLsizei count, const GLint *value) = 0;
     virtual void Uniform1fv(GLint location, GLsizei count, const GLfloat *value) = 0;
+
+    virtual void BindTexture(GLenum target, GLuint texture) = 0;
+    virtual void TexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels) = 0;
+    virtual void TexParameteri(GLenum target, GLenum pname, GLint param) = 0;
 };
 
 // ================= Qt Implementation =================
@@ -76,7 +82,15 @@ public:
         f()->glGetShaderInfoLog(shader, bufSize, length, infoLog);
     }
 
-    // 新增函数实现
+    void GenFramebuffers(GLsizei n, GLuint *framebuffers) override
+    {
+        f()->glGenFramebuffers(n, framebuffers);
+    }
+    void DeleteFramebuffers(GLsizei n, const GLuint *framebuffers) override
+    {
+        f()->glDeleteFramebuffers(n, framebuffers);
+    }
+
     GLint GetUniformLocation(GLuint program, const char *name) override { return f()->glGetUniformLocation(program, name); }
     GLint GetAttribLocation(GLuint program, const char *name) override { return f()->glGetAttribLocation(program, name); }
 
@@ -95,6 +109,16 @@ public:
     }
     void Uniform1iv(GLint location, GLsizei count, const GLint *value) override { f()->glUniform1iv(location, count, value); }
     void Uniform1fv(GLint location, GLsizei count, const GLfloat *value) override { f()->glUniform1fv(location, count, value); }
+
+    void BindTexture(GLenum target, GLuint texture) override { f()->glBindTexture(target, texture); }
+    void TexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels) override
+    {
+        f()->glTexImage2D(target, level, internalFormat, width, height, border, format, type, pixels);
+    }
+    void TexParameteri(GLenum target, GLenum pname, GLint param) override
+    {
+        f()->glTexParameteri(target, pname, param);
+    }
 };
 
 // ================= GL Facade Implementation =================
@@ -120,141 +144,141 @@ namespace miraipet::GL
 
     GLuint GL::CreateShader(GLenum type)
     {
-        assert(g_impl && "GL not initialized!");
         return g_impl->CreateShader(type);
     }
 
     void GL::DeleteShader(GLuint id)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->DeleteShader(id);
     }
 
     void GL::ShaderSource(GLuint shader, const char *src)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->ShaderSource(shader, src);
     }
 
     void GL::CompileShader(GLuint shader)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->CompileShader(shader);
     }
 
     GLuint CreateProgram()
     {
-        assert(g_impl && "GL not initialized!");
         return g_impl->CreateProgram();
     }
 
     void DeleteProgram(GLuint id)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->DeleteProgram(id);
     }
 
     void AttachShader(GLuint program, GLuint shader)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->AttachShader(program, shader);
     }
 
     void LinkProgram(GLuint program)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->LinkProgram(program);
     }
 
     void GetProgramiv(GLuint program, GLenum pname, GLint *params)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->GetProgramiv(program, pname, params);
     }
 
     void GetProgramInfoLog(GLuint program, GLsizei bufSize, GLsizei *length, char *infoLog)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->GetProgramInfoLog(program, bufSize, length, infoLog);
     }
 
     void GetShaderiv(GLuint shader, GLenum pname, GLint *params)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->GetShaderiv(shader, pname, params);
     }
 
     void GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, char *infoLog)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->GetShaderInfoLog(shader, bufSize, length, infoLog);
     }
 
-    // 新增函数实现
+    void GenFramebuffers(GLsizei n, GLuint *framebuffers)
+    {
+        g_impl->GenFramebuffers(n, framebuffers);
+    }
+
+    void DeleteFramebuffers(GLsizei n, const GLuint *framebuffers)
+    {
+        g_impl->DeleteFramebuffers(n, framebuffers);
+    }
+
     GLint GetUniformLocation(GLuint program, const char *name)
     {
-        assert(g_impl && "GL not initialized!");
         return g_impl->GetUniformLocation(program, name);
     }
 
     GLint GetAttribLocation(GLuint program, const char *name)
     {
-        assert(g_impl && "GL not initialized!");
         return g_impl->GetAttribLocation(program, name);
     }
 
     void Uniform1i(GLint location, GLint v0)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->Uniform1i(location, v0);
     }
 
     void Uniform1f(GLint location, GLfloat v0)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->Uniform1f(location, v0);
     }
 
     void Uniform2fv(GLint location, GLsizei count, const GLfloat *value)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->Uniform2fv(location, count, value);
     }
 
     void Uniform3fv(GLint location, GLsizei count, const GLfloat *value)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->Uniform3fv(location, count, value);
     }
 
     void Uniform4fv(GLint location, GLsizei count, const GLfloat *value)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->Uniform4fv(location, count, value);
     }
 
     void UniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->UniformMatrix3fv(location, count, transpose, value);
     }
 
     void UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->UniformMatrix4fv(location, count, transpose, value);
     }
 
     void Uniform1iv(GLint location, GLsizei count, const GLint *value)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->Uniform1iv(location, count, value);
     }
 
     void Uniform1fv(GLint location, GLsizei count, const GLfloat *value)
     {
-        assert(g_impl && "GL not initialized!");
         g_impl->Uniform1fv(location, count, value);
     }
 
+    void BindTexture(GLenum target, GLuint texture)
+    {
+        g_impl->BindTexture(target, texture);
+    }
+
+    void TexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+    {
+        g_impl->TexImage2D(target, level, internalFormat, width, height, border, format, type, pixels);
+    }
+
+    void TexParameteri(GLenum target, GLenum pname, GLint param)
+    {
+        g_impl->TexParameteri(target, pname, param);
+    }
 }

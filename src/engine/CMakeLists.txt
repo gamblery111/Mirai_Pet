@@ -4,6 +4,9 @@ add_library(mirai_pet_engine STATIC
     render/PetShaderManager.cpp
     runtime/PetRuntime.cpp
     context/ViewerContext.cpp
+    view/Camera.cpp
+    view/Light.cpp
+    view/ShadowMap.cpp
 )
 
 target_include_directories(mirai_pet_engine
@@ -17,4 +20,5 @@ target_link_libraries(mirai_pet_engine
     PRIVATE
         Saba
         mirai_BaseUtils
+        mirai_GL
 )
